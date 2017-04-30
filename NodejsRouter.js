@@ -3,6 +3,7 @@
 // we bring the module of http which helps to use http properties
 const http = require('http');
 const url = require('url');
+const qs = require('querystring');
 
 let routes = {
     'GET' : {
@@ -14,12 +15,29 @@ let routes = {
           res.writeHead(200,{'Content-type':'text/html'});
           res.end('<h1> This is about page </h1>')
         },
-        '/api/info': (req, res)=> {
+        '/api/info' : (req, res)=> {
             res.writeHead(200, {'Content-type':'application/json'});
             res.end(JSON.stringify(req.queryParams));
         }
     },
-    'POST' : {},
+    'POST' : {
+      'api/login':(req, res) => {
+        let body = '';
+
+        req.on('data', data => {
+  				body += data;
+  			});
+
+        req.on('end', () => {
+          let params = qs.parse(body);
+          console.log('User name : ', params['username']);
+          console.log('Password :', params['password']);
+          // Query for saving data to database
+          res.end();
+        });
+
+      }
+    },
     'NA':(req, res)=>{
       res.writeHead(404);
       res.end(' 404 Error ');
@@ -46,6 +64,6 @@ function router(req, res){
   //  console.log('Request header :' ,req.header);
 }
 
-http.createServer(router).listen(3080, () => {
-  console.log("Sever is running on 3080 port no");
+http.createServer(router).listen(3050, () => {
+  console.log("Sever is running on 3050 port no");
 });
